@@ -15,5 +15,5 @@ clean:
 info:
 	aws cloudformation describe-stacks \
     --stack-name $(STACK_NAME) \
-    --query 'Stacks[].Outputs[?OutputKey==`SlackChatOpsApi`]' \
+    --query 'Stacks[].Outputs[?OutputKey==`HelloWorldApi`]' \
     --output table
