@@ -14,9 +14,9 @@ logger.setLevel(logging.INFO)
 
 AWS_S3_BUCKET_NAME = 'cocnpk-data'
 
-lst_trigger_param = ["name","STR","CON","POW","DEX","APP","SIZ","INT","EDU","HP","MP","初期SAN","現在SAN","アイデア","幸運","知識"]
-lst_trigger_role = ["応急手当", "鍵開け", "隠す" , "隠れる", "聞き耳", "忍び歩き","写真術", "精神分析", "追跡", "登攀", "図書館", "目星", "運転", "機械修理", "重機械操作", "乗馬", "水泳", "製作.*?", "操縦.*?", "跳躍","電気修理", "ナビゲート", "変装", "言いくるめ", "信用", "説得", "値切り",  "母国語.*?", "医学", "オカルト", "化学", "クトゥルフ神話", "芸術.*?", "経理", "考古学", "コンピューター", "心理学", "人類学",  "生物学", "地質学", "電子工学",  "天文学",  "博物学","物理学", "法律", "薬学", "歴史", "製作.*?"]
-lst_trigger_action = ["回避", "キック", "組み付き", "こぶし（パンチ）", "頭突き", "投擲", "マーシャルアーツ", "拳銃", "サブマシンガン", "ショットガン", "マシンガン", "ライフル"]
+LST_TRIGGER_PARAM = ["name","STR","CON","POW","DEX","APP","SIZ","INT","EDU","HP","MP","初期SAN","現在SAN","アイデア","幸運","知識"]
+LST_TRIGGER_ROLE = ["応急手当", "鍵開け", "隠す" , "隠れる", "聞き耳", "忍び歩き","写真術", "精神分析", "追跡", "登攀", "図書館", "目星", "運転", "機械修理", "重機械操作", "乗馬", "水泳", "製作.*?", "操縦.*?", "跳躍","電気修理", "ナビゲート", "変装", "言いくるめ", "信用", "説得", "値切り",  "母国語.*?", "医学", "オカルト", "化学", "クトゥルフ神話", "芸術.*?", "経理", "考古学", "コンピューター", "心理学", "人類学",  "生物学", "地質学", "電子工学",  "天文学",  "博物学","物理学", "法律", "薬学", "歴史", "製作.*?"]
+LST_TRIGGER_ACTION = ["回避", "キック", "組み付き", "こぶし（パンチ）", "頭突き", "投擲", "マーシャルアーツ", "拳銃", "サブマシンガン", "ショットガン", "マシンガン", "ライフル"]
 
 def build_response(message):
     return {
@@ -179,10 +179,10 @@ def lambda_handler(event: dict, context) -> str:
     elif "get" == message:
         #match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", txt_message)
         return_message = get_user_params(user_id)
-    elif message in lst_trigger_param:
+    elif message in LST_TRIGGER_PARAM:
         param = json.loads(get_user_params(user_id, ""))
         return_message = "【{}】現在値{}".format(message, param[message])
-    elif message in lst_trigger_role:
+    elif message in LST_TRIGGER_ROLE:
         param = json.loads(get_user_params(user_id, ""))
         lst = param[message]
         num = int(random.randint(1,100))
@@ -194,7 +194,7 @@ def lambda_handler(event: dict, context) -> str:
             str_result = "失敗"
 
         return_message = "{} 【{}】 {}/{} ({}+{})".format(str_result, message, num, lst[-1], lst[-1], 0)
-    elif message in lst_trigger_action:
+    elif message in LST_TRIGGER_ACTION:
         param = json.loads(get_user_params(user_id, ""))
         lst = param[message]
         num = int(random.randint(1,100))
@@ -220,7 +220,7 @@ def lambda_handler(event: dict, context) -> str:
         param = json.loads(get_user_params(user_id, ""))
         return_message = ""
         cnt = 0
-        for p in lst_trigger_param:
+        for p in LST_TRIGGER_PARAM:
             cnt += 1
             return_message += "{}:{} ".format(p, param[p])
             if cnt == 1:
