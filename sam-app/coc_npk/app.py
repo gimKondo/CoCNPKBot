@@ -165,26 +165,22 @@ def lambda_handler(event: dict, context) -> str:
     if "subtype" in query_params:
         return build_response("subtype event")
 
-    url = "https://slack.com/api/chat.postMessage"
-    print(query_params["text"])
-    txt_message = urllib.parse.unquote(query_params["text"])
-    print(txt_message)
-    message = txt_message
-    print(txt_message)
-    if re.match("set.<https:\/\/charasheet\.vampire-blood\.net\/.*" , txt_message):
+    logging.info(f"text: {query_params['text']}")
+    cmd_param = query_params["text"][0]
+    if re.match("set.<https:\/\/charasheet\.vampire-blood\.net\/.*" , cmd_param):
         logging.info("setting start")
 
-        match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", txt_message)
+        match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", cmd_param)
         return_message = set_user_params(user_id, match_url.group(1))
-    elif "get" == message:
-        #match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", txt_message)
+    elif "get" == cmd_param:
+        #match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", cmd_param)
         return_message = get_user_params(user_id)
-    elif message in LST_TRIGGER_PARAM:
+    elif cmd_param in LST_TRIGGER_PARAM:
         param = json.loads(get_user_params(user_id, ""))
-        return_message = "【{}】現在値{}".format(message, param[message])
-    elif message in LST_TRIGGER_ROLE:
+        return_message = "【{}】現在値{}".format(cmd_param, param[cmd_param])
+    elif cmd_param in LST_TRIGGER_ROLE:
         param = json.loads(get_user_params(user_id, ""))
-        lst = param[message]
+        lst = param[cmd_param]
         num = int(random.randint(1,100))
         num_targ = lst[-1]
         str_result = ""
@@ -193,10 +189,10 @@ def lambda_handler(event: dict, context) -> str:
         else:
             str_result = "失敗"
 
-        return_message = "{} 【{}】 {}/{} ({}+{})".format(str_result, message, num, lst[-1], lst[-1], 0)
-    elif message in LST_TRIGGER_ACTION:
+        return_message = "{} 【{}】 {}/{} ({}+{})".format(str_result, cmd_param, num, lst[-1], lst[-1], 0)
+    elif cmd_param in LST_TRIGGER_ACTION:
         param = json.loads(get_user_params(user_id, ""))
-        lst = param[message]
+        lst = param[cmd_param]
         num = int(random.randint(1,100))
         num_targ = lst[-1]
         str_result = ""
@@ -205,18 +201,18 @@ def lambda_handler(event: dict, context) -> str:
         else:
             str_result = "失敗"
 
-        return_message = "{} 【{}】 {}/{} ({}+{})".format(str_result, message, num, lst[-1], lst[-1], 0)
-    elif "景気づけ" == message:
+        return_message = "{} 【{}】 {}/{} ({}+{})".format(str_result, cmd_param, num, lst[-1], lst[-1], 0)
+    elif "景気づけ" == cmd_param:
         num = int(random.randint(1,100))
         return_message = "景気づけ：{}".format(num)
-    elif "素振り" == message:
+    elif "素振り" == cmd_param:
         num = int(random.randint(1,100))
         return_message = "素振り：{}".format(num)
-    elif "起床ガチャ" == message:
+    elif "起床ガチャ" == cmd_param:
         num = int(random.randint(1,100))
         return_message = "起床ガチャ：{}".format(num)
 
-    elif "能力値" == message:
+    elif "能力値" == cmd_param:
         param = json.loads(get_user_params(user_id, ""))
         return_message = ""
         cnt = 0
@@ -228,7 +224,7 @@ def lambda_handler(event: dict, context) -> str:
             elif cnt == 9:
                 break
 
-    elif "ステータス" == message:
+    elif "ステータス" == cmd_param:
         param = json.loads(get_user_params(user_id, ""))
         return_message = "【{}】\nHP {}/{}　　MP {}/{}　　SAN{}/{}".format(param["name"], param["HP"],param["HP"],param["MP"],param["MP"],param["現在SAN"],param["初期SAN"])
 
