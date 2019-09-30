@@ -158,22 +158,16 @@ def lambda_handler(event: dict, context) -> str:
     logging.info(f"event = {json.dumps(event)}")
     body = event["body"]
 
-    body_split = body.split("&")
-    print(body_split)
-    #evt_slack = body["event"]
-    evt_slack = {}
-    for datum in body_split:
-        l = datum.split("=")
-        evt_slack[l[0]] = l[1]
-    user_id = evt_slack["user_id"]
-    logging.info(json.dumps(evt_slack))
+    query_params = urllib.parse.parse_qs(event["body"])
+    user_id = query_params["user_id"]
+    logging.info(json.dumps(query_params))
 
-    if "subtype" in evt_slack:
+    if "subtype" in query_params:
         return build_response("subtype event")
 
     url = "https://slack.com/api/chat.postMessage"
-    print(evt_slack["text"])
-    txt_message = urllib.parse.unquote(evt_slack["text"])
+    print(query_params["text"])
+    txt_message = urllib.parse.unquote(query_params["text"])
     print(txt_message)
     message = txt_message
     print(txt_message)
