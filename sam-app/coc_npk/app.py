@@ -159,15 +159,16 @@ def lambda_handler(event: dict, context) -> str:
     body = event["body"]
 
     query_params = urllib.parse.parse_qs(event["body"])
-    user_id = query_params["user_id"]
+    user_id = query_params["user_id"][0]
     logging.info(json.dumps(query_params))
+    logging.info(f"user_id: {user_id}")
 
     if "subtype" in query_params:
         return build_response("subtype event")
 
     logging.info(f"text: {query_params['text']}")
     cmd_param = query_params["text"][0]
-    if re.match("set.<https:\/\/charasheet\.vampire-blood\.net\/.*" , cmd_param):
+    if re.match(r"set\s+https://charasheet\.vampire-blood\.net/.*" , cmd_param):
         logging.info("setting start")
 
         match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", cmd_param)
