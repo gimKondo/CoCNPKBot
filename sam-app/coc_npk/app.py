@@ -41,6 +41,7 @@ def get_user_params(user_id, url = None):
     return body.decode('utf-8')
 
 def set_user_params(user_id, url):
+    logging.info(f"set_user_params(user_id:{user_id}, url:{url})")
     key = user_id + "/test_npc"
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
@@ -74,6 +75,7 @@ def set_user_params(user_id, url):
             m_name = re.match('.*<input name="pc_name" class="str" id="pc_name" size="55" type="text" value="(.*)">.*', line)
             if m_name:
                 name = m_name.group(1)
+                logging.info(f"user_id:{user_id} / url:{url}")
 
         if False == is_role_end:
             if is_role_now_parse:
@@ -91,7 +93,7 @@ def set_user_params(user_id, url):
                 role_now_parse = ""
 
             for role in lst_role:
-                m = re.match('.*<th>({})<\/th>.*'.format(role), line)
+                m = re.match('.*<th>({})</th>.*'.format(role), line)
                 if m:
                     is_role_now_parse = True
                     role_now_parse = m.group(1)
@@ -115,7 +117,7 @@ def set_user_params(user_id, url):
                 role_now_parse = ""
 
             for action in lst_action:
-                m = re.match('.*<th>({})<\/th>.*'.format(action), line)
+                m = re.match('.*<th>({})</th>.*'.format(action), line)
                 if m:
                     is_action_now_parse = True
                     action_now_parse = m.group(1)
@@ -152,6 +154,11 @@ def set_user_params(user_id, url):
 
     body = json.dumps(dict_param, ensure_ascii=False)
 
+    response = obj.put(
+        Body=body.encode('utf-8'),
+        ContentEncoding='utf-8',
+        ContentType='text/plane'
+    )
     return "setting"
 
 def lambda_handler(event: dict, context) -> str:
