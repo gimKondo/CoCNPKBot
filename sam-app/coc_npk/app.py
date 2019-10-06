@@ -100,7 +100,6 @@ def set_user_params(user_id, url):
 
         if False == is_action_end:
             if is_action_now_parse:
-                print("aaa")
 
                 if not action_now_parse in dict_action:
                     dict_action[action_now_parse] = []
@@ -154,11 +153,13 @@ def set_user_params(user_id, url):
 
     body = json.dumps(dict_param, ensure_ascii=False)
 
+    logging.info(f"put json: {body}")
     response = obj.put(
         Body=body.encode('utf-8'),
         ContentEncoding='utf-8',
         ContentType='text/plane'
     )
+    logging.info(f"finish to put on S3: {response}")
     return "setting"
 
 def lambda_handler(event: dict, context) -> str:
