@@ -12,7 +12,7 @@ import urllib.parse
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-AWS_S3_BUCKET_NAME = 'cocnpk-data'
+AWS_S3_BUCKET_NAME = os.environ["DATA_BUCKET_NAME"]
 
 LST_TRIGGER_PARAM = ["name","STR","CON","POW","DEX","APP","SIZ","INT","EDU","HP","MP","初期SAN","現在SAN","アイデア","幸運","知識"]
 LST_TRIGGER_ROLE = ["応急手当", "鍵開け", "隠す" , "隠れる", "聞き耳", "忍び歩き","写真術", "精神分析", "追跡", "登攀", "図書館", "目星", "運転", "機械修理", "重機械操作", "乗馬", "水泳", "製作.*?", "操縦.*?", "跳躍","電気修理", "ナビゲート", "変装", "言いくるめ", "信用", "説得", "値切り",  "母国語.*?", "医学", "オカルト", "化学", "クトゥルフ神話", "芸術.*?", "経理", "考古学", "コンピューター", "心理学", "人類学",  "生物学", "地質学", "電子工学",  "天文学",  "博物学","物理学", "法律", "薬学", "歴史", "製作.*?"]
@@ -41,6 +41,7 @@ def get_user_params(user_id, url = None):
     return body.decode('utf-8')
 
 def set_user_params(user_id, url):
+    logging.info(f"set_user_params(user_id:{user_id}, url:{url})")
     key = user_id + "/test_npc"
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
@@ -74,6 +75,7 @@ def set_user_params(user_id, url):
             m_name = re.match('.*<input name="pc_name" class="str" id="pc_name" size="55" type="text" value="(.*)">.*', line)
             if m_name:
                 name = m_name.group(1)
+                logging.info(f"user_id:{user_id} / url:{url}")
 
         if False == is_role_end:
             if is_role_now_parse:
@@ -91,14 +93,13 @@ def set_user_params(user_id, url):
                 role_now_parse = ""
 
             for role in lst_role:
-                m = re.match('.*<th>({})<\/th>.*'.format(role), line)
+                m = re.match('.*<th>({})</th>.*'.format(role), line)
                 if m:
                     is_role_now_parse = True
                     role_now_parse = m.group(1)
 
         if False == is_action_end:
             if is_action_now_parse:
-                print("aaa")
 
                 if not action_now_parse in dict_action:
                     dict_action[action_now_parse] = []
@@ -115,7 +116,7 @@ def set_user_params(user_id, url):
                 role_now_parse = ""
 
             for action in lst_action:
-                m = re.match('.*<th>({})<\/th>.*'.format(action), line)
+                m = re.match('.*<th>({})</th>.*'.format(action), line)
                 if m:
                     is_action_now_parse = True
                     action_now_parse = m.group(1)
@@ -152,6 +153,13 @@ def set_user_params(user_id, url):
 
     body = json.dumps(dict_param, ensure_ascii=False)
 
+    logging.info(f"put json: {body}")
+    response = obj.put(
+        Body=body.encode('utf-8'),
+        ContentEncoding='utf-8',
+        ContentType='text/plane'
+    )
+    logging.info(f"finish to put on S3: {response}")
     return "setting"
 
 def lambda_handler(event: dict, context) -> str:
@@ -159,15 +167,16 @@ def lambda_handler(event: dict, context) -> str:
     body = event["body"]
 
     query_params = urllib.parse.parse_qs(event["body"])
-    user_id = query_params["user_id"]
+    user_id = query_params["user_id"][0]
     logging.info(json.dumps(query_params))
+    logging.info(f"user_id: {user_id}")
 
     if "subtype" in query_params:
         return build_response("subtype event")
 
     logging.info(f"text: {query_params['text']}")
     cmd_param = query_params["text"][0]
-    if re.match("set.<https:\/\/charasheet\.vampire-blood\.net\/.*" , cmd_param):
+    if re.match(r"set\s+https://charasheet\.vampire-blood\.net/.*" , cmd_param):
         logging.info("setting start")
 
         match_url  = re.match(".*(https?://[\w/:%#\$&\?\(\)~\.=\+\-]+)", cmd_param)

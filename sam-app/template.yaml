@@ -9,14 +9,23 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+    MemorySize: 512
 
 Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
   CocNPKFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: coc_npk/
       Handler: app.lambda_handler
       Runtime: python3.7
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref DataBucket
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          DATA_BUCKET_NAME: !Ref DataBucket
       Events:
         CocNPK:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
