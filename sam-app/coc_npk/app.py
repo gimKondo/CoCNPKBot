@@ -12,7 +12,7 @@ import urllib.parse
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-AWS_S3_BUCKET_NAME = 'cocnpk-data'
+AWS_S3_BUCKET_NAME = os.environ["DATA_BUCKET_NAME"]
 
 LST_TRIGGER_PARAM = ["name","STR","CON","POW","DEX","APP","SIZ","INT","EDU","HP","MP","初期SAN","現在SAN","アイデア","幸運","知識"]
 LST_TRIGGER_ROLE = ["応急手当", "鍵開け", "隠す" , "隠れる", "聞き耳", "忍び歩き","写真術", "精神分析", "追跡", "登攀", "図書館", "目星", "運転", "機械修理", "重機械操作", "乗馬", "水泳", "製作.*?", "操縦.*?", "跳躍","電気修理", "ナビゲート", "変装", "言いくるめ", "信用", "説得", "値切り",  "母国語.*?", "医学", "オカルト", "化学", "クトゥルフ神話", "芸術.*?", "経理", "考古学", "コンピューター", "心理学", "人類学",  "生物学", "地質学", "電子工学",  "天文学",  "博物学","物理学", "法律", "薬学", "歴史", "製作.*?"]
